@@ -20,37 +20,32 @@ Instrukcje uruchomienia projektu:
 
 Kompilacja programu:
 
-Aby skompilować kod, użyj poniższego polecenia w terminalu w miejscu gdzie jest plik filoczas.cpp i makefile do tego pliku:
-w bashu:
+Aby skompilować kod, użyj poniższego polecenia w terminalu w miejscu gdzie jest plik filoczas.cpp i makefile do tego pliku w bashu:
 
         make
             
-Lub ręcznie z użyciem kompilatora g++:
-w bashu:
+Lub ręcznie z użyciem kompilatora g++ w bashu:
 
         g++ -pthread -std=c++11 -Wall -Wextra -o filoczas filoczas.cpp
 
 
 Uruchomienie programu:
 
-Program wymaga podania liczby filozofów jako argumentu:
-w bashu:
+Program wymaga podania liczby filozofów jako argumentu w bashu:
 
         ./filoczas <liczba_filozofow>
         
-Na przykład, aby uruchomić program dla 5 filozofów:
-w bashu:
+Na przykład, aby uruchomić program dla 5 filozofów w bashu:
 
         ./filoczas 5
 
 Uruchamianie z Makefile: 
-Domyślnie program uruchomi się z 5 filozofami:
-w bashu:
+
+Domyślnie program uruchomi się z 5 filozofami w bashu:
 
         make run
 
-Aby zmienić liczbę filozofów:
-w bashu: 
+Aby zmienić liczbę filozofów w bashu: 
 
         make run NUM_FILOSOFOW=7
 
