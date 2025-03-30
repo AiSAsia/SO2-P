@@ -7,15 +7,15 @@ Problem jedzących filozofów to klasyczne zagadnienie z zakresu współbieżno�
 
 Cele projektu:
 
-    Zaimplementowanie mechanizmu synchronizacji za pomocą monitorów (mutexy, zmienne warunkowe).
+Zaimplementowanie mechanizmu synchronizacji za pomocą monitorów (mutexy, zmienne warunkowe).
 
-    Jest to zapewnienie, że:
+Jest to zapewnienie, że:
 
-        - Nie występują zakleszczenia (deadlock).
+- Nie występują zakleszczenia (deadlock).
 
-        - Filozofowie nie są zagłodzeni (starvation).
+- Filozofowie nie są zagłodzeni (starvation).
 
-        - Wszystkie współbieżne operacje są zsynchronizowane i poprawnie zarządzane.
+- Wszystkie współbieżne operacje są zsynchronizowane i poprawnie zarządzane.
 
 Instrukcje uruchomienia projektu:
 
@@ -51,51 +51,51 @@ Opis problemu - Problem jedzących filozofów:
 
 Filozofowie siedzą przy okrągłym stole, gdzie każdy z nich:
 
-    - Myśli przez pewien czas.
+- Myśli przez pewien czas.
 
-    - Próbuje wziąć dwa widelce (z lewej i prawej strony).
+- Próbuje wziąć dwa widelce (z lewej i prawej strony).
 
-    - Je, jeśli oba widelce są dostępne.
+- Je, jeśli oba widelce są dostępne.
 
-    - Odkłada widelce, umożliwiając korzystanie z nich innym filozofom.
+- Odkłada widelce, umożliwiając korzystanie z nich innym filozofom.
 
 Wyzwania:
 
-    - Deadlock: Jeśli każdy filozof weźmie jeden widelec i będzie czekać na drugi, program wpadnie w zakleszczenie.
+- Deadlock: Jeśli każdy filozof weźmie jeden widelec i będzie czekać na drugi, program wpadnie w zakleszczenie.
 
-    - Głód: Niektórzy filozofowie mogą nigdy nie dostać widelców, jeśli inni filozofowie zdominują zasoby.
+- Głód: Niektórzy filozofowie mogą nigdy nie dostać widelców, jeśli inni filozofowie zdominują zasoby.
 
-    - Współdzielenie zasobów: Widelce są zasobami współdzielonymi i wymagają synchronizacji.
+- Współdzielenie zasobów: Widelce są zasobami współdzielonymi i wymagają synchronizacji.
 
 Rozwiązania zastosowane w programie:
 
-    Monitor: Synchronizacja za pomocą klasy Monitor, która wykorzystuje pthread_mutex_t i pthread_cond_t.
+- Monitor: Synchronizacja za pomocą klasy Monitor, która wykorzystuje pthread_mutex_t i pthread_cond_t.
 
-    Zarządzanie stanami: Każdy filozof może być w jednym z trzech stanów: myśli, głodny, je. Tylko głodny filozof może przejść w stan je, jeśli oba sąsiednie widelce są dostępne.
+- Zarządzanie stanami: Każdy filozof może być w jednym z trzech stanów: myśli, głodny, je. Tylko głodny filozof może przejść w stan je, jeśli oba sąsiednie widelce są dostępne.
 
-    Zmienne warunkowe: Synchronizacja między filozofami z wykorzystaniem zmiennych warunkowych, które sygnalizują zmianę stanu filozofa.
+- Zmienne warunkowe: Synchronizacja między filozofami z wykorzystaniem zmiennych warunkowych, które sygnalizują zmianę stanu filozofa.
 
 Wątki:
 
-    Każdy filozof jest reprezentowany przez osobny wątek.
+Każdy filozof jest reprezentowany przez osobny wątek.
 
-    Wątki wykonują w pętli:
+Wątki wykonują w pętli:
 
-        - Myślenie: Symulowane za pomocą funkcji sleep.
+- Myślenie: Symulowane za pomocą funkcji sleep.
 
-        - Jedzenie: Wymaga dostępu do obu widelców.
+- Jedzenie: Wymaga dostępu do obu widelców.
 
-        - Oddawanie zasobów: Oddanie widelców, odblokowanie sąsiednich filozofów.
+- Oddawanie zasobów: Oddanie widelców, odblokowanie sąsiednich filozofów.
 
 Sekcje krytyczne:
 
 Sekcje krytyczne w programie to momenty, w których filozofowie modyfikują współdzielone zasoby (stany filozofów, dostępność widelców). Są one zabezpieczone za pomocą mutexów i zmiennych warunkowych:
 
-    - Wejście do sekcji krytycznej: Wywołanie pthread_mutex_lock w funkcjach wez_widelce i odloz_widelce.
+- Wejście do sekcji krytycznej: Wywołanie pthread_mutex_lock w funkcjach wez_widelce i odloz_widelce.
 
-    - Wyjście z sekcji krytycznej: Wywołanie pthread_mutex_unlock po zakończeniu operacji.
+- Wyjście z sekcji krytycznej: Wywołanie pthread_mutex_unlock po zakończeniu operacji.
 
-    - Zmienne warunkowe: pthread_cond_wait i pthread_cond_signal umożliwiają filozofom czekanie na dostępność widelców i sygnalizowanie zmian.
+- Zmienne warunkowe: pthread_cond_wait i pthread_cond_signal umożliwiają filozofom czekanie na dostępność widelców i sygnalizowanie zmian.
 
 
 Program jest zgodny z założeniami klasycznego problemu jedzących filozofów.
