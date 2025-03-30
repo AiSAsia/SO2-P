@@ -14,7 +14,7 @@ jobs:
         run: sudo apt-get install -y cppcheck
 
       - name: List files
-        run: ls -R Problem_jedzacych_filozofów  # Wyświetl zawartość katalogu
+        run: ls -R Problem_jedzacych_filozofow  # Wyświetl zawartość katalogu
 
       - name: Run cppcheck
-        run: cppcheck --enable=all --inconclusive Problem_jedzacych_filozofów/filoczas.cpp
+        run: cppcheck --enable=all --inconclusive Problem_jedzacych_filozofow/filoczas.cpp
