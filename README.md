@@ -97,19 +97,6 @@ Sekcje krytyczne w programie to momenty, w których filozofowie modyfikują wsp�
 
     - Zmienne warunkowe: pthread_cond_wait i pthread_cond_signal umożliwiają filozofom czekanie na dostępność widelców i sygnalizowanie zmian.
 
-Przykład: Funkcja wez_widelce:
-void wez_widelce(int numerFilozofa) {
-    pthread_mutex_lock(&blokada);
-    stan[numerFilozofa] = 1; // Ustaw filozofa na głodny
-    test(numerFilozofa); // Sprawdź, czy może jeść
-    while (stan[numerFilozofa] != 0) {
-        pthread_cond_wait(&warunki[numerFilozofa], &blokada);
-    }
-    pthread_mutex_unlock(&blokada);
-}
-Tutaj filozof czeka na zmiennej warunkowej, dopóki oba sąsiednie widelce nie będą dostępne.
-
-
 
 Program jest zgodny z założeniami klasycznego problemu jedzących filozofów.
 
