@@ -17,4 +17,4 @@ jobs:
         run: ls -R problem_jedzacych_filozofow  # Wyświetl zawartość katalogu
 
       - name: Run cppcheck
-        run: cppcheck --enable=all --inconclusive Problem_jedzacych_filozofow/filoczas.cpp
+        run: cppcheck --enable=all --inconclusive Problem_jedzacych_filozofów/filoczas.cpp
