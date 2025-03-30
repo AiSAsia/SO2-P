@@ -21,29 +21,41 @@ Instrukcje uruchomienia projektu:
 Kompilacja programu:
 
 Aby skompilować kod, użyj poniższego polecenia w terminalu w miejscu gdzie jest plik filoczas.cpp i makefile do tego pliku:
-bash-> make
+w bashu:
+
+        make
+            
 Lub ręcznie z użyciem kompilatora g++:
-bash-> g++ -pthread -std=c++11 -Wall -Wextra -o filoczas filoczas.cpp
+w bashu:
+
+        g++ -pthread -std=c++11 -Wall -Wextra -o filoczas filoczas.cpp
+
 
 Uruchomienie programu:
 
 Program wymaga podania liczby filozofów jako argumentu:
 w bashu:
-  ./filoczas <liczba_filozofow>
+
+        ./filoczas <liczba_filozofow>
+        
 Na przykład, aby uruchomić program dla 5 filozofów:
 w bashu:
-  ./filoczas 5
+
+        ./filoczas 5
 
 Uruchamianie z Makefile: 
 Domyślnie program uruchomi się z 5 filozofami:
-bash:
-  make run
+w bashu:
+
+        make run
 
 Aby zmienić liczbę filozofów:
-bash: 
-  make run NUM_FILOSOFOW=7
+w bashu: 
+
+        make run NUM_FILOSOFOW=7
 
 Przerwanie programu:
+
 Program można zatrzymać w dowolnym momencie, naciskając klawisze Ctrl + C.
 
 Opis problemu - Problem jedzących filozofów:
