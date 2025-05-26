@@ -1,9 +1,9 @@
-name: C++ Code Analysis
+name: C/C++ Code Analysis
 
 on: [push, pull_request]
 
 jobs:
-  cppcheck:
+  cpp-analysis:
     runs-on: ubuntu-latest
 
     steps:
@@ -13,8 +13,14 @@ jobs:
       - name: Install cppcheck
         run: sudo apt-get install -y cppcheck
 
-      - name: List files
-        run: ls -R Problem_jedzacych_filozofow  # Wyświetl zawartość katalogu
+      - name: List files (for debugging)
+        run: ls -R
 
-      - name: Run cppcheck
+      - name: Run cppcheck on Philosophers problem
         run: cppcheck --enable=all --inconclusive Problem_jedzacych_filozofow/filoczas.cpp
+
+      - name: Run cppcheck on Chat server
+        run: cppcheck --enable=all --inconclusive chat2/server/main.c
+
+      - name: Run cppcheck on Chat client
+        run: cppcheck --enable=all --inconclusive chat2/client/main.c
