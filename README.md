@@ -99,6 +99,12 @@ Przykładowa sesja:
 
 
 
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+===================================================================================================================================================================================
+
+
+
 Projekt : Problem jedzących filozofów - Opis projektu:
 
 Problem jedzących filozofów to klasyczne zagadnienie z zakresu współbieżności, które ilustruje trudności w synchronizacji procesów, unikania zakleszczeń i zapewnienia wydajności w korzystaniu ze współdzielonych zasobów. Program symuluje grupę filozofów siedzących przy okrągłym stole. Filozofowie naprzemiennie myślą i jedzą, korzystając z dwóch widelców do jedzenia. Aby jedzenie było możliwe, filozof musi mieć dostęp do obu widelców – jednego z lewej i jednego z prawej.
