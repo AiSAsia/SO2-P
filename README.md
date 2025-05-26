@@ -20,7 +20,7 @@ Cele Projektu:
 🛠 Instalacja i Uruchomienie:
 
 Kompilacja
-```bash
+
 make clean      # Wyczyść poprzednie kompilacje
 make            # Zbuduj projekt 
 
