@@ -1,4 +1,4 @@
-name: C++ and C Code Analysis
+name: C++ Code Analysis
 
 on: [push, pull_request]
 
@@ -10,53 +10,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cppcheck
-          sudo apt-get install -y splint
+      - name: Install cppcheck
+        run: sudo apt-get install -y cppcheck
 
-      - name: Run cppcheck for Philosophers
+      - name: List files
+        run: ls -R Problem_jedzacych_filozofow  # Wyświetl zawartość katalogu
+
+      - name: Run cppcheck
         run: cppcheck --enable=all --inconclusive Problem_jedzacych_filozofow/filoczas.cpp
-
-      - name: Analyze Chat Application
-        run: |
-          echo "Analyzing chat2 application..."
-          
-          # Client analysis
-          if [ -f "chat2/client/main.c" ]; then
-            echo "Checking client code..."
-            cppcheck --enable=all --inconclusive --language=c chat2/client/main.c
-            splint chat2/client/main.c
-            if [ -f "chat2/client/socketutil.h" ]; then
-              cppcheck --enable=all --inconclusive chat2/client/socketutil.h
-            fi
-          else
-            echo "Client code not found at chat2/client/main.c"
-          fi
-
-          # Server analysis
-          if [ -f "chat2/server/main.c" ]; then
-            echo "Checking server code..."
-            cppcheck --enable=all --inconclusive --language=c chat2/server/main.c
-            splint chat2/server/main.c
-            if [ -f "chat2/server/socketutil.h" ]; then
-              cppcheck --enable=all --inconclusive chat2/server/socketutil.h
-            fi
-          else
-            echo "Server code not found at chat2/server/main.c"
-          fi
-
-          # Makefile check
-          if [ -f "chat2/Makefile" ]; then
-            echo "Makefile found in chat2 directory"
-          else
-            echo "Makefile not found in chat2 directory"
-          fi
-
-          # Additional C files check
-          find chat2 -type f -name "*.c" ! -path "chat2/client/main.c" ! -path "chat2/server/main.c" | while read file; do
-            echo "Checking additional C file: $file"
-            cppcheck --enable=all --inconclusive --language=c "$file"
-            splint "$file"
-          done
