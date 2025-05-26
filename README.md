@@ -1,122 +1,97 @@
 # SO2
 
-Chat2 - Wielowątkowy Czat Klient-Serwer
+🗨️ Wielowątkowy Czat Klient-Serwer w C
 
-Opis Projektu - chat:
-Implementacja wielowątkowego czatu klient-serwer wykorzystującego gniazda sieciowe (sockets TCP/IP). Serwer obsługuje wielu klientów jednocześnie, przesyłając wiadomości między nimi w czasie rzeczywistym.
+📖 Opis Projektu
+Implementacja wielowątkowego czatu klient-serwer. Serwer obsługuje wielu klientów jednocześnie, zapewniając płynną komunikację w czasie rzeczywistym. Projekt demonstruje praktyczne zastosowanie:
+- Programowania sieciowego
+- Synchronizacji współbieżnych operacji
+- Zarządzania zasobami systemowymi
 
-Cele Projektu:
-- Komunikacja między wieloma klientami
-- Synchronizacja wątków przy użyciu mutexów
-- Efektywne zarządzanie połączeniami sieciowymi
-- Obsługa bezpiecznego zamykania połączeń
+🎯 Cele Projektu
+1. **Implementacja bezpiecznej komunikacji** między wieloma klientami
+2. **Zapobieganie zakleszczeniom** (deadlock)
+3. **Efektywne zarządzanie** połączeniami sieciowymi
+4. **Poprawna obsługa** błędów i wyjątków
 
-📦 Wymagania:
-- System Linux
+🛠️ Wymagania
+- System Linux (testowane na Debianie i PopOS)
 - Kompilator GCC (min. wersja 9.4.0)
 - Biblioteka pthread
-- Narzędzia make
+- Podstawowa znajomość terminala
 
-🛠 Instalacja i Uruchomienie:
+ 🚀 Instrukcja Uruchomienia
 
-Kompilacja
+Kompilacja w bashu :
 
-make clean      # Wyczyść poprzednie kompilacje
-make            # Zbuduj projekt 
+    make clean      # Wyczyść poprzednie kompilacje
+    make            # Zbuduj klienta i serwer
+    
+Uruchomienie:
+# Terminal 1 - Serwer
+    ./chat_server
 
-Uruchomienie Serwera
-bash
+# Terminal 2 - Klient (powtórz dla każdego uczestnika)
+    ./chat_client
 
-./chat_server
+🖥️ Interfejs Użytkownika
 
-Serwer domyślnie nasłuchuje na porcie 2000
-Uruchomienie Klienta
-bash
+Po uruchomieniu klienta:
 
-./chat_client
+    Podaj swój nick? [Wpisz pseudonim]
 
-Uruchomienie z Makefile
-bash
+Wysyłanie wiadomości:
 
-make run_server   # Uruchamia serwer w tle
-make run_client   # Uruchamia klienta
-
-🖥 Interfejs Użytkownika:
-
-    Po uruchomieniu klienta:
-
-Podaj swój nick?
-[Wprowadź swój pseudonim]
-
-Wprowadzanie wiadomości:
-
-Możesz już pisać wiadomości (napisz 'exit' by wyjść)...
-[Twoja wiadomość]
+    [Twój tekst] + Enter
 
 Odbieranie wiadomości:
 
-    Otrzymano: [Nick]: [Wiadomość]
+    Otrzymano: [Nick]: [Treść]
 
-🏗 Architektura Systemu
-Diagram
-Code
-⚙️ Mechanizmy Synchronizacji
+Wyjście:
 
-    Wątki:
+    exit + Enter 
 
-        Każdy klient obsługiwany przez osobny wątek
+🔧 Mechanizmy Synchronizacji
 
-        Wątek nasłuchujący na wiadomości
+ Wątki:
 
-    Mutexy:
+- Główny wątek akceptujący połączenia
 
-        Bezpieczny dostęp do listy aktywnych połączeń
+- Wątek dla klienta (obsługa komunikacji)
 
-        Synchronizacja operacji I/O
+ Mutexy:
 
-    Zarządzanie pamięcią:
+ - Chronią listę aktywnych połączeń
 
-        Automatyczne zwalnianie zasobów
+ - Synchronizują operacje I/O
 
-        Bezpieczne zamykanie gniazd sieciowych
+Zarządzanie zasobami:
 
-📂 Struktura Projektu
+-Automatyczne zwalnianie pamięci
 
-chat2/
-├── client/
-│   ├── main.c            # Logika klienta
-│   └── socketutil.h      # Narzędzia sieciowe
-├── server/
-│   ├── main.c            # Logika serwera
-│   └── socketutil.h      # Narzędzia sieciowe
-├── Makefile              # System budowania
-└── README.md             # Dokumentacja
+ -Bezpieczne zamykanie gniazd sieciowych
 
-Testowanie
+ ⚠️ Znane Ograniczenia:
 
-    Uruchom serwer:
-    bash
-
-./chat_server
-
-Uruchom wielu klientów (w osobnych terminalach):
-bash
-
-./chat_client
-
+-Maksymalnie 10 aktywnych połączeń
+-Brak szyfrowania komunikacji
+-Podstawowy interfejs tekstowy
+-Brak historii czatu
+    
 Przykładowa sesja:
 
-[Terminal 1 - Serwer]
-Nawiazano polaczenie
+    [Terminal 1 - Serwer]
+    Nawiazano polaczenie
 
-[Terminal 2 - Klient 1]
-Podaj swój nick? As
-Witam!
+     [Terminal 2 - Klient 1]
+    Podaj swój nick? As
+    Witam!
 
-[Terminal 3 - Klient 2]
-Podaj swój nick? Mich
-Otrzymano: As: Witam!
-Cześć As! 
+    [Terminal 3 - Klient 2]
+    Podaj swój nick? Mich
+    Otrzymano: As: Witam!
+    Cześć As! 
 
 
 
