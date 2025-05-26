@@ -1,5 +1,130 @@
 # SO2
-Problem jedzących filozofów - Opis projektu:
+
+Chat2 - Wielowątkowy Czat Klient-Serwer
+
+Opis Projektu - chat:
+Implementacja wielowątkowego czatu klient-serwer wykorzystującego gniazda sieciowe (sockets TCP/IP). Serwer obsługuje wielu klientów jednocześnie, przesyłając wiadomości między nimi w czasie rzeczywistym.
+
+Cele Projektu:
+- Komunikacja między wieloma klientami
+- Synchronizacja wątków przy użyciu mutexów
+- Efektywne zarządzanie połączeniami sieciowymi
+- Obsługa bezpiecznego zamykania połączeń
+
+📦 Wymagania:
+- System Linux
+- Kompilator GCC (min. wersja 9.4.0)
+- Biblioteka pthread
+- Narzędzia make
+
+🛠 Instalacja i Uruchomienie:
+
+Kompilacja
+```bash
+make clean      # Wyczyść poprzednie kompilacje
+make            # Zbuduj projekt 
+
+Uruchomienie Serwera
+bash
+
+./chat_server
+
+Serwer domyślnie nasłuchuje na porcie 2000
+Uruchomienie Klienta
+bash
+
+./chat_client
+
+Uruchomienie z Makefile
+bash
+
+make run_server   # Uruchamia serwer w tle
+make run_client   # Uruchamia klienta
+
+🖥 Interfejs Użytkownika:
+
+    Po uruchomieniu klienta:
+
+Podaj swój nick?
+[Wprowadź swój pseudonim]
+
+Wprowadzanie wiadomości:
+
+Możesz już pisać wiadomości (napisz 'exit' by wyjść)...
+[Twoja wiadomość]
+
+Odbieranie wiadomości:
+
+    Otrzymano: [Nick]: [Wiadomość]
+
+🏗 Architektura Systemu
+Diagram
+Code
+⚙️ Mechanizmy Synchronizacji
+
+    Wątki:
+
+        Każdy klient obsługiwany przez osobny wątek
+
+        Wątek nasłuchujący na wiadomości
+
+    Mutexy:
+
+        Bezpieczny dostęp do listy aktywnych połączeń
+
+        Synchronizacja operacji I/O
+
+    Zarządzanie pamięcią:
+
+        Automatyczne zwalnianie zasobów
+
+        Bezpieczne zamykanie gniazd sieciowych
+
+📂 Struktura Projektu
+
+chat2/
+├── client/
+│   ├── main.c            # Logika klienta
+│   └── socketutil.h      # Narzędzia sieciowe
+├── server/
+│   ├── main.c            # Logika serwera
+│   └── socketutil.h      # Narzędzia sieciowe
+├── Makefile              # System budowania
+└── README.md             # Dokumentacja
+
+Testowanie
+
+    Uruchom serwer:
+    bash
+
+./chat_server
+
+Uruchom wielu klientów (w osobnych terminalach):
+bash
+
+./chat_client
+
+Przykładowa sesja:
+
+[Terminal 1 - Serwer]
+Nawiazano polaczenie
+
+[Terminal 2 - Klient 1]
+Podaj swój nick? As
+Witam!
+
+[Terminal 3 - Klient 2]
+Podaj swój nick? Mich
+Otrzymano: As: Witam!
+Cześć As! 
+
+
+
+
+
+
+
+Projekt : Problem jedzących filozofów - Opis projektu:
 
 Problem jedzących filozofów to klasyczne zagadnienie z zakresu współbieżności, które ilustruje trudności w synchronizacji procesów, unikania zakleszczeń i zapewnienia wydajności w korzystaniu ze współdzielonych zasobów. Program symuluje grupę filozofów siedzących przy okrągłym stole. Filozofowie naprzemiennie myślą i jedzą, korzystając z dwóch widelców do jedzenia. Aby jedzenie było możliwe, filozof musi mieć dostęp do obu widelców – jednego z lewej i jednego z prawej.
 
