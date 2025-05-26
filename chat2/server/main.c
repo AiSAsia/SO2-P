@@ -1,7 +1,12 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "socketutil.h"
+
+#define MAX_CLIENTS 10
 
 struct AcceptedSocket {
     int acceptedSocketFD;
@@ -10,33 +15,83 @@ struct AcceptedSocket {
     bool acceptedSuccessfully;
 };
 
+// Struktura do przekazywania argumentów do wątku
+struct ThreadArgs {
+    int socketFD;
+    struct ServerState* state;
+};
+
+// Struktura zarządzająca stanem serwera
+struct ServerState {
+    struct AcceptedSocket acceptedSockets[MAX_CLIENTS];
+    int acceptedSocketsCount;
+    bool serverRunning;
+    pthread_mutex_t mutex;
+};
+
+// Inicjalizacja stanu serwera
+void initServerState(struct ServerState* state) {
+    state->acceptedSocketsCount = 0;
+    state->serverRunning = true;
+    pthread_mutex_init(&state->mutex, NULL);
+}
+
+// Niszczenie stanu serwera
+void destroyServerState(struct ServerState* state) {
+    pthread_mutex_destroy(&state->mutex);
+}
+
 struct AcceptedSocket *acceptIncomingConnection(int serverSocketFD);
-void startAcceptingIncomingConnections(int serverSocketFD);
-void receiveAndPrintIncomingDataOnSeparateThread(struct AcceptedSocket *pSocket);
-void sendReceivedMessageToTheOtherClients(char *buffer, int socketFD);
-void receiveAndPrintIncomingData(int socketFD);
+void startAcceptingIncomingConnections(int serverSocketFD, struct ServerState* state);
+void receiveAndPrintIncomingDataOnSeparateThread(struct AcceptedSocket *pSocket, struct ServerState* state);
+void sendReceivedMessageToTheOtherClients(char *buffer, int socketFD, struct ServerState* state);
+void receiveAndPrintIncomingData(struct ThreadArgs* args);
+void cleanUpClosedSockets(struct ServerState* state);
+void* cleanUpThread(void* arg);
 
-struct AcceptedSocket acceptedSockets[10];
-int acceptedSocketsCount = 0;
-
-void startAcceptingIncomingConnections(int serverSocketFD) {
+void startAcceptingIncomingConnections(int serverSocketFD, struct ServerState* state) {
     while (true) {
+        // Sprawdź czy serwer powinien nadal działać
+        pthread_mutex_lock(&state->mutex);
+        bool running = state->serverRunning;
+        pthread_mutex_unlock(&state->mutex);
+
+        if (!running) break;
+
         struct AcceptedSocket* clientSocket = acceptIncomingConnection(serverSocketFD);
         if (clientSocket->acceptedSuccessfully) {
-            acceptedSockets[acceptedSocketsCount++] = *clientSocket;
-            receiveAndPrintIncomingDataOnSeparateThread(clientSocket);
+            pthread_mutex_lock(&state->mutex);
+
+            if (state->acceptedSocketsCount < MAX_CLIENTS) {
+                state->acceptedSockets[state->acceptedSocketsCount++] = *clientSocket;
+                pthread_mutex_unlock(&state->mutex);
+                receiveAndPrintIncomingDataOnSeparateThread(clientSocket, state);
+            } else {
+                pthread_mutex_unlock(&state->mutex);
+                close(clientSocket->acceptedSocketFD);
+                printf("Osiagnieto maksymalna liczbe polaczen\n");
+            }
         }
-        free(clientSocket); // Zwolnij pamięć po akceptowanym połączeniu
+        free(clientSocket);
     }
 }
 
-void receiveAndPrintIncomingDataOnSeparateThread(struct AcceptedSocket *pSocket) {
+void receiveAndPrintIncomingDataOnSeparateThread(struct AcceptedSocket *pSocket, struct ServerState* state) {
     pthread_t id;
-    pthread_create(&id, NULL, (void *(*)(void *))receiveAndPrintIncomingData, (void *)(intptr_t)pSocket->acceptedSocketFD);
-    pthread_detach(id); // Odłącz wątek, aby uniknąć wycieków pamięci
+    struct ThreadArgs *args = malloc(sizeof(struct ThreadArgs));
+
+    args->socketFD = pSocket->acceptedSocketFD;
+    args->state = state;
+
+    pthread_create(&id, NULL, (void* (*)(void*))receiveAndPrintIncomingData, args);
+    pthread_detach(id);
 }
 
-void receiveAndPrintIncomingData(int socketFD) {
+void receiveAndPrintIncomingData(struct ThreadArgs* args) {
+    int socketFD = args->socketFD;
+    struct ServerState* state = args->state;
+    free(args); // Zwolnienie pamięci po argumencie
+
     char buffer[1024];
 
     while (true) {
@@ -44,21 +99,72 @@ void receiveAndPrintIncomingData(int socketFD) {
         if (amountReceived > 0) {
             buffer[amountReceived] = 0;
             printf("%s\n", buffer);
-            sendReceivedMessageToTheOtherClients(buffer, socketFD);
+            sendReceivedMessageToTheOtherClients(buffer, socketFD, state);
         }
-        if (amountReceived == 0)
+        if (amountReceived <= 0) {
+            // Zamknięcie połączenia
+            pthread_mutex_lock(&state->mutex);
+            for (int i = 0; i < state->acceptedSocketsCount; i++) {
+                if (state->acceptedSockets[i].acceptedSocketFD == socketFD) {
+                    state->acceptedSockets[i].acceptedSuccessfully = false;
+                    break;
+                }
+            }
+            pthread_mutex_unlock(&state->mutex);
+            close(socketFD);
             break;
+        }
     }
-
-    close(socketFD);
 }
 
-void sendReceivedMessageToTheOtherClients(char *buffer, int socketFD) {
-    for (int i = 0; i < acceptedSocketsCount; i++) {
-        if (acceptedSockets[i].acceptedSocketFD != socketFD) {
-            send(acceptedSockets[i].acceptedSocketFD, buffer, strlen(buffer), 0);
+void sendReceivedMessageToTheOtherClients(char *buffer, int socketFD, struct ServerState* state) {
+    pthread_mutex_lock(&state->mutex);
+
+    for (int i = 0; i < state->acceptedSocketsCount; i++) {
+        if (state->acceptedSockets[i].acceptedSocketFD != socketFD &&
+            state->acceptedSockets[i].acceptedSuccessfully) {
+
+            if (send(state->acceptedSockets[i].acceptedSocketFD, buffer, strlen(buffer), 0) < 0) {
+                // Błąd wysyłania - oznacz połączenie jako nieaktywne
+                state->acceptedSockets[i].acceptedSuccessfully = false;
+                close(state->acceptedSockets[i].acceptedSocketFD);
+            }
         }
     }
+
+    pthread_mutex_unlock(&state->mutex);
+}
+
+void cleanUpClosedSockets(struct ServerState* state) {
+    pthread_mutex_lock(&state->mutex);
+
+    int newCount = 0;
+    for (int i = 0; i < state->acceptedSocketsCount; i++) {
+        if (state->acceptedSockets[i].acceptedSuccessfully) {
+            state->acceptedSockets[newCount++] = state->acceptedSockets[i];
+        }
+    }
+    state->acceptedSocketsCount = newCount;
+
+    pthread_mutex_unlock(&state->mutex);
+}
+
+void* cleanUpThread(void* arg) {
+    struct ServerState* state = (struct ServerState*)arg;
+
+    while (true) {
+        sleep(5); // Czyszczenie co 5 sekund
+
+        // Sprawdź czy serwer nadal działa
+        pthread_mutex_lock(&state->mutex);
+        bool running = state->serverRunning;
+        pthread_mutex_unlock(&state->mutex);
+
+        if (!running) break;
+
+        cleanUpClosedSockets(state);
+    }
+    return NULL;
 }
 
 struct AcceptedSocket *acceptIncomingConnection(int serverSocketFD) {
@@ -79,6 +185,9 @@ struct AcceptedSocket *acceptIncomingConnection(int serverSocketFD) {
 }
 
 int main() {
+    struct ServerState state;
+    initServerState(&state);
+
     int serverSocketFD = createTCPIpv4Socket();
     struct sockaddr_in *serverAddress = createIPv4Address("", 2000);
 
@@ -89,13 +198,39 @@ int main() {
     int listenResult = listen(serverSocketFD, 10);
     if (listenResult < 0) {
         perror("Listen failed");
+        free(serverAddress);
+        destroyServerState(&state);
         return 1;
     }
 
-    startAcceptingIncomingConnections(serverSocketFD);
+    // Uruchom wątek czyszczący
+    pthread_t cleanerId;
+    pthread_create(&cleanerId, NULL, cleanUpThread, &state);
+
+    // Uruchom główną pętlę serwera
+    startAcceptingIncomingConnections(serverSocketFD, &state);
+
+    // Zatrzymanie serwera
+    pthread_mutex_lock(&state.mutex);
+    state.serverRunning = false;
+    pthread_mutex_unlock(&state.mutex);
+
+    // Zamknięcie wszystkich aktywnych połączeń
+    pthread_mutex_lock(&state.mutex);
+    for (int i = 0; i < state.acceptedSocketsCount; i++) {
+        if (state.acceptedSockets[i].acceptedSuccessfully) {
+            close(state.acceptedSockets[i].acceptedSocketFD);
+        }
+    }
+    pthread_mutex_unlock(&state.mutex);
+
+    // Oczekiwanie na zakończenie wątku czyszczącego
+    pthread_join(cleanerId, NULL);
 
     shutdown(serverSocketFD, SHUT_RDWR);
-    free(serverAddress); // Zwolnij pamięć po adresie serwera
+    free(serverAddress);
+    destroyServerState(&state);
 
     return 0;
 }
+

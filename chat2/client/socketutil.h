@@ -1,5 +1,6 @@
 #ifndef SOCKETUTIL_SOCKETUTIL_H
 #define SOCKETUTIL_SOCKETUTIL_H
+#include <stdint.h>
 
 #include <stdio.h>
 #include <sys/socket.h>
