@@ -3,7 +3,7 @@
 🗨️ Wielowątkowy Czat Klient-Serwer w C
 
 📖 Opis Projektu
-Implementacja wielowątkowego czatu klient-serwer. Serwer obsługuje wielu klientów jednocześnie, zapewniając płynną komunikację w czasie rzeczywistym. Projekt demonstruje praktyczne zastosowanie:
+Czat to nowoczesna aplikacja komunikacyjna umożliwiająca prowadzenie rozmów tekstowych w czasie rzeczywistym pomiędzy wieloma użytkownikami. System został zaprojektowany w architekturze klient–serwer, co oznacza, że wszystkie wiadomości przesyłane są przez centralny serwer, który pośredniczy w komunikacji między klientami. Każdy użytkownik – za pośrednictwem aplikacji klienckiej – może dołączyć do czatu, wysyłać wiadomości oraz natychmiast otrzymywać odpowiedzi od innych uczestników.  Projekt demonstruje praktyczne zastosowanie:
 - Programowania sieciowego
 - Synchronizacji współbieżnych operacji
 - Zarządzania zasobami systemowymi
